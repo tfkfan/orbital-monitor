@@ -1,3 +1,5 @@
+![logo.svg](logo.svg)
+
 # orbital-monitor
 
 This is "Orbital" framework admin and monitoring application
