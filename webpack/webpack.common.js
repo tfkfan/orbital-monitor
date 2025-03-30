@@ -103,7 +103,7 @@ module.exports = async options => {
           template: './src/main/webapp/index.html',
           chunksSortMode: 'auto',
           inject: 'body',
-          base: options.base ? options.base : '/',
+          base: options.env === "production" ? '/monitor/' : '/',
         }),
         new MergeJsonWebpackPlugin({
           output: {
