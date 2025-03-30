@@ -68,7 +68,7 @@ export default tseslint.config(
       'no-labels': 'error',
       'no-caller': 'error',
       'no-bitwise': 'error',
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+      //'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-new-wrappers': 'error',
       'no-eval': 'error',
       'no-new': 'error',

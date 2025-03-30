@@ -13,7 +13,8 @@ import ErrorBoundary from 'app/shared/error/error-boundary';
 import AppRoutes from 'app/routes';
 import {Container} from "reactstrap";
 
-const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
+export const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
+export const originBaseHref = document.querySelector('base').getAttribute('href');
 
 export const App = () => {
   const currentLocale = useAppSelector(state => state.locale.currentLocale);
