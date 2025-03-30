@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 export const Brand = () => (
-  <NavbarBrand tag={Link} to="/page" className="brand-logo">
+  <NavbarBrand tag={Link} to="/" className="brand-logo">
     <img className="brand-icon" src="content/images/orbital.svg"/>
     <span className="brand-title">
       <Translate contentKey="global.title">orbital-monitor</Translate>

@@ -1,11 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
-const { merge } = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-const { hashElement } = require('folder-hash');
+const {hashElement} = require('folder-hash');
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin');
 const utils = require('./utils.js');
 const environment = require('./environment');
@@ -36,7 +36,7 @@ module.exports = async options => {
   const languagesHash = await hashElement(path.resolve(__dirname, '../src/main/webapp/i18n'), {
     algo: 'md5',
     encoding: 'hex',
-    files: { include: ['*.json'] },
+    files: {include: ['*.json']},
   });
 
   return merge(
@@ -95,20 +95,21 @@ module.exports = async options => {
         new ForkTsCheckerWebpackPlugin(),
         new CopyWebpackPlugin({
           patterns: [
-            { from: './src/main/webapp/content/', to: 'content/' },
-            { from: './src/main/webapp/favicon.ico', to: 'favicon.ico' }
+            {from: './src/main/webapp/content/', to: 'content/'},
+            {from: './src/main/webapp/favicon.ico', to: 'favicon.ico'}
           ],
         }),
         new HtmlWebpackPlugin({
           template: './src/main/webapp/index.html',
           chunksSortMode: 'auto',
           inject: 'body',
+          base: options.base ? options.base : '/',
         }),
         new MergeJsonWebpackPlugin({
           output: {
             groupBy: [
-              { pattern: './src/main/webapp/i18n/en/*.json', fileName: './i18n/en.json' },
-              { pattern: './src/main/webapp/i18n/ru/*.json', fileName: './i18n/ru.json' }
+              {pattern: './src/main/webapp/i18n/en/*.json', fileName: './i18n/en.json'},
+              {pattern: './src/main/webapp/i18n/ru/*.json', fileName: './i18n/ru.json'}
             ],
           },
         }),

@@ -9,6 +9,7 @@ import {useAppDispatch} from 'app/config/store';
 import {setLocale} from 'app/shared/reducers/locale';
 import {LocaleMenu} from '../menus';
 import {Brand} from './header-components';
+import AdminMenu from "app/shared/layout/menus/admin";
 
 export interface IHeaderProps {
   currentLocale: string;
@@ -35,6 +36,7 @@ const Header = (props: IHeaderProps) => {
         <Brand/>
         <Collapse isOpen={menuOpen} navbar>
           <Nav id="header-tabs" className="ms-auto" navbar>
+            <AdminMenu />
             <LocaleMenu currentLocale={props.currentLocale} onClick={handleLocaleChange}/>
           </Nav>
         </Collapse>

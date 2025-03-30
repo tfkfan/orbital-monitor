@@ -13,13 +13,14 @@ import ErrorBoundary from 'app/shared/error/error-boundary';
 import AppRoutes from 'app/routes';
 import {Container} from "reactstrap";
 
+const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
 
 export const App = () => {
   const currentLocale = useAppSelector(state => state.locale.currentLocale);
 
   const paddingTop = '60px';
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={baseHref}>
       <div className="app-container" style={{paddingTop}}>
         <ToastContainer position="top-left" className="toastify-container" toastClassName="toastify-toast"/>
         <ErrorBoundary>

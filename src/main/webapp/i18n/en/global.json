@@ -6,7 +6,12 @@
     "menu": {
       "about": "About",
       "contacts": "Contacts",
-      "language": "Language"
+      "language": "Language",
+      "admin": {
+        "main": "Administration",
+        "metrics": "Metrics",
+        "health": "Health"
+      }
     },
     "form": {
       "username.label": "Username",
