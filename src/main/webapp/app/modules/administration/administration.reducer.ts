@@ -9,7 +9,7 @@ const initialState = {
   errorMessage: null,
   health: {} as any,
   metrics: {} as any,
-  progressCompatibleMetrics: {} as any,
+  parsedMetrics: {} as any,
   totalItems: 0,
 };
 
@@ -25,25 +25,66 @@ export const getSystemMetrics = createAsyncThunk('administration/fetch_metrics',
   serializeError: serializeAxiosError,
 });
 
-const FIELDS = ["used", "max"];
+const PROGRESS_FIELDS = ["used", "max"];
+const SIMPLE_TYPES = ["gauge", "functionalCounter", "counter"];
 
 const processMetrics = (metrics): any => {
   const res = {};
-  for (const field of FIELDS) {
-    for (const [key, value] of Object.entries<any>(metrics)) {
-      if (key.indexOf(field) === key.length - field.length) {
-        const prefix = key.replace(`.${field}`, '');
-        value.forEach((it: { [x: string]: any; tags: { id: any; }; }) => {
+  for (const [key, value] of Object.entries<any>(metrics)) {
+    for (const field of PROGRESS_FIELDS) {
+      const prefix = key.replace(`.${field}`, '');
+      value.forEach((it: {
+        [x: string]: any;
+        tags: { id: any; };
+        type: string;
+        value?: any;
+        count?: number;
+        mean?: number;
+        total?: number;
+        max?: number;
+        meanMs?:number;
+        totalTimeMs?:number;
+        maxMs?:number;
+      }) => {
+        if (key.indexOf(field) === key.length - field.length) {
           const k = `${prefix}.${it.tags.id}`
-          res[k] = res[k] === undefined ? {} : res[k];
-          res[k][field] = it["value"];
-        });
-      }
+          res["resources"] = res["resources"] === undefined ? {} : res["resources"];
+          res["resources"][k] = res["resources"][k] === undefined ? {} : res["resources"][k];
+          res["resources"][k][field] = it["value"];
+        } else if (SIMPLE_TYPES.includes(it.type)) {
+          res["gauge"] = res["gauge"] === undefined ? [] : res["gauge"];
+          const k = `${key}/${it.tags.id ? it.tags.id : JSON.stringify(it.tags)}`
+          res["gauge"].push({
+            key: k,
+            value: it.type === "gauge" ? it.value : it.count
+          });
+        } else if (it.type === "summary") {
+          const k = `${key}/${it.tags.id ? it.tags.id : JSON.stringify(it.tags)}`
+          res["summary"] = res["summary"] === undefined ? [] : res["summary"];
+          res["summary"].push({
+            key: k,
+            count: it.count,
+            mean: it.mean,
+            total: it.total,
+            max: it.max
+          })
+        }else if (it.type === "timer") {
+          const k = `${key}/${it.tags.id ? it.tags.id : JSON.stringify(it.tags)}`
+          res["timer"] = res["timer"] === undefined ? [] : res["timer"];
+          res["timer"].push({
+            key: k,
+            count: it.count,
+            meanMs: it.meanMs,
+            totalTimeMs: it.totalTimeMs,
+            maxMs: it.maxMs
+          })
+        }
+      });
     }
   }
-  for (const [key, value] of Object.entries<any>(res)) {
+  for (const [key, value] of Object.entries<any>(res["resources"])) {
     if (value["used"] === undefined || value["max"] === undefined || value["max"] === -1)
-      delete res[key];
+      delete res["resources"][key];
   }
   return res;
 }
@@ -61,7 +102,7 @@ export const AdministrationSlice = createSlice({
       .addCase(getSystemMetrics.fulfilled, (state, action) => {
         state.loading = false;
         state.metrics = action.payload.data;
-        state.progressCompatibleMetrics = processMetrics(state.metrics);
+        state.parsedMetrics = processMetrics(state.metrics);
       })
 
       .addMatcher(isPending(getSystemHealth, getSystemMetrics), state => {
