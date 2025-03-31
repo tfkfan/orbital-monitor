@@ -6,7 +6,13 @@
     "menu": {
       "about": "О себе",
       "contacts": "Контакты",
-      "language": "Язык"
+      "language": "Язык",
+      "admin": {
+        "main": "Администрирование",
+        "userManagement": "Управление пользователями",
+        "metrics": "Метрики",
+        "health": "Состояние"
+      }
     },
     "messages": {
       "info": {
