@@ -1,9 +1,21 @@
 import React, {useEffect} from 'react';
 import {Button, Col, Progress, Row, Table} from 'reactstrap';
-import {TextFormat, Translate,} from 'react-jhipster';
+import {
+  GarbageCollectorMetrics,
+  HttpRequestMetrics,
+  JvmMemory,
+  JvmThreads,
+  SystemMetrics,
+  TextFormat,
+  Translate,
+} from 'react-jhipster';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
-import {APP_WHOLE_NUMBER_FORMAT} from 'app/config/constants';
+import {
+  APP_TIMESTAMP_FORMAT,
+  APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT,
+  APP_WHOLE_NUMBER_FORMAT
+} from 'app/config/constants';
 import {useAppDispatch, useAppSelector} from 'app/config/store';
 import {getSystemMetrics} from '../administration.reducer';
 
@@ -76,79 +88,45 @@ export const MetricsPage = () => {
         </Button>
       </p>
       <hr/>
-      {parsedMetrics && parsedMetrics.resources &&
-        <div>
-          <span>System metrics</span>
-          {Object.entries<any>(parsedMetrics.resources).map(entry =>
-            <div key={entry[0]}>
-              <Row>
-                <Col md="9">{entry[0]}</Col>
-              </Row>
-              <Progress animated min={0} value={entry[1]["used"]} max={entry[1]["max"]} color="success">
-              <span>               <TextFormat value={(entry[1].used * 100) / entry[1].max} type="number"
-                                               format={APP_WHOLE_NUMBER_FORMAT}/>%</span>
-              </Progress>
-            </div>)}
-        </div>
-      }
-      <hr/>
-      <div>
-        {parsedMetrics && parsedMetrics.gauge && <Row>
-          <Table striped>
-            <thead>
-            <tr>
-              <th>
-                Gauge/Counter metrics
-              </th>
-              <th>
-                Value
-              </th>
-            </tr>
-            </thead>
-            <tbody>
-            {parsedMetrics.gauge.map((it, idx) => formatGaugeTableRowItem(it, idx))}
-            </tbody>
-          </Table>
-        </Row>}
 
-        {parsedMetrics && parsedMetrics.summary && <Row>
-          <Table striped>
-            <thead>
-            <tr>
-              <th>
-                Summary metrics
-              </th>
-              <th>Count</th>
-              <th>Total</th>
-              <th>Mean</th>
-              <th>Max</th>
-            </tr>
-            </thead>
-            <tbody>
-            {parsedMetrics.summary.map((it, idx) => formatSummaryTableRowItem(it, idx))}
-            </tbody>
-          </Table>
-        </Row>}
-        {parsedMetrics && parsedMetrics.timer &&
+      <Row>
+        <Col sm="12">
+          <h3>
+            <Translate contentKey="metrics.jvm.title">JVM Metrics</Translate>
+          </h3>
           <Row>
-            <Table striped>
-              <thead>
-              <tr>
-                <th>
-                  Timer metrics
-                </th>
-                <th>Count</th>
-                <th>TotalTimeMs</th>
-                <th>MeanMs</th>
-                <th>MaxMs</th>
-              </tr>
-              </thead>
-              <tbody>
-              {parsedMetrics.timer.map((it, idx) => formatTimerTableRowItem(it, idx))}
-              </tbody>
-            </Table>
-          </Row>}
-      </div>
+            <Col md="4">{parsedMetrics?.jvm ?
+              <JvmMemory jvmMetrics={parsedMetrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+            <Col md="4">{parsedMetrics?.threadDump ?
+              <JvmThreads jvmThreads={parsedMetrics?.threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+            <Col md="4">
+              {parsedMetrics?.processMetrics ? (
+                <SystemMetrics
+                  systemMetrics={parsedMetrics.processMetrics}
+                  wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+                  timestampFormat={APP_TIMESTAMP_FORMAT}
+                />
+              ) : (
+                ''
+              )}
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+      {parsedMetrics?.garbageCollector ? (
+        <GarbageCollectorMetrics garbageCollectorMetrics={parsedMetrics.garbageCollector} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
+      ) : (
+        ''
+      )}
+      {parsedMetrics && parsedMetrics['http.server.requests'] ? (
+        <HttpRequestMetrics
+          requestMetrics={parsedMetrics['http.server.requests']}
+          twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
+          wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+        />
+      ) : (
+        ''
+      )}
     </div>
   );
 };
