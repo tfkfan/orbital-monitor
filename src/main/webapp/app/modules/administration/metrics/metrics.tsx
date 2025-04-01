@@ -91,7 +91,7 @@ export const MetricsPage = () => {
       <hr/>
 
       <Row>
-        <Col md={4}>
+        <Col md={12}>
           {metrics && metrics['orbital.metrics'] ? (
             <GameMetrics
               gameMetrics={metrics['orbital.metrics']}
@@ -111,18 +111,11 @@ export const MetricsPage = () => {
             <Col md="4">{metrics?.jvm ?
               <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
             <Col md="4">{metrics?.threadDump ?
-              <JvmThreads jvmThreads={metrics?.threadDump}
-                          wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+              <JvmThreads jvmThreads={metrics?.threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
             <Col md="4">
               {metrics?.processMetrics ? (
-                <SystemMetrics
-                  systemMetrics={metrics.processMetrics}
-                  wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
-                  timestampFormat={APP_TIMESTAMP_FORMAT}
-                />
-              ) : (
-                ''
-              )}
+                <SystemMetrics systemMetrics={metrics.processMetrics} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} timestampFormat={APP_TIMESTAMP_FORMAT}/>
+              ) : ('')}
             </Col>
           </Row>
         </Col>

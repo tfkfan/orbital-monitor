@@ -3,8 +3,16 @@
     "title": "Application Metrics",
     "refresh.button": "Refresh",
     "updating": "Updating...",
+    "metric": "Metric",
+    "value": "Value",
     "game": {
-      "title": "Game Metrics"
+      "title": "Game metrics"
+    },
+    "manager": {
+      "title": "Game manager metrics"
+    },
+    "rooms": {
+      "title": "Game rooms metrics"
     },
     "jvm": {
       "title": "JVM Metrics",
