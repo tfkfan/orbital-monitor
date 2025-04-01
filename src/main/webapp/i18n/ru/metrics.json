@@ -3,6 +3,9 @@
     "title": "Метрики приложения",
     "refresh.button": "Обновить",
     "updating": "Обновление...",
+    "game": {
+      "title": "Игровые метрики"
+    },
     "jvm": {
       "title": "JVM Метрики",
       "memory": {

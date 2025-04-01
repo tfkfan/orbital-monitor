@@ -9,7 +9,6 @@ const initialState = {
   errorMessage: null,
   health: {} as any,
   metrics: {} as any,
-  parsedMetrics: {} as any,
   totalItems: 0,
 };
 
@@ -83,6 +82,29 @@ const processMetrics = (metrics): any => {
   res["http.server.requests"]["all"]["count"] = metrics["vertx.http.server.requests"].reduce((acc, it) => acc + it["count"], 0)
   res["http.server.requests"]["percode"] = {};
 
+  res["orbital.metrics"] = {};
+  res["orbital.metrics"]["game"] = {};
+  res["orbital.metrics"]["total"] = [];
+
+  Object.entries(metrics)
+    .map((metric: any) => {
+      if (metric[0].indexOf("com.tfkfan.orbital.total") !== -1) {
+        res["orbital.metrics"]["total"].push({
+          key: metric[0],
+          value: metric[1].reduce((acc, it) => acc + it["value"], 0)
+        });
+      } else if (metric[0].lastIndexOf("com.tfkfan.orbital.game") !== -1) {
+        metric[1].forEach(it => {
+          res["orbital.metrics"]["game"] = res["orbital.metrics"]["game"] !== undefined ? res["orbital.metrics"]["game"] : {};
+          res["orbital.metrics"]["game"][it.tags.id] = res["orbital.metrics"]["game"][it.tags.id] !== undefined ? res["orbital.metrics"]["game"][it.tags.id] : {}
+
+          const k = metric[0].indexOf("max") !== -1 ? "max" : "current";
+          res["orbital.metrics"]["game"][it.tags.id][k] = it.value;
+        })
+      }
+    });
+
+
   metrics["vertx.http.server.requests"].forEach(it => {
     res["http.server.requests"]["percode"][it.tags.code] = res["http.server.requests"]["percode"][it.tags.code] !== undefined ? res["http.server.requests"]["percode"][it.tags.code]
       : {};
@@ -99,8 +121,8 @@ const processMetrics = (metrics): any => {
     v.mean = v.mean !== undefined ? v.mean : 0;
     v.max = v.max !== undefined ? v.max : 0;
 
-    v.mean += it.meanMs/v.count;
-    v.max += it.maxMs/v.count;
+    v.mean += it.meanMs / v.count;
+    v.max += it.maxMs / v.count;
   });
 
 
@@ -125,8 +147,7 @@ export const AdministrationSlice = createSlice({
       })
       .addCase(getSystemMetrics.fulfilled, (state, action) => {
         state.loading = false;
-        state.metrics = action.payload.data;
-        state.parsedMetrics = processMetrics(state.metrics);
+        state.metrics = processMetrics(action.payload.data);
       })
 
       .addMatcher(isPending(getSystemHealth, getSystemMetrics), state => {

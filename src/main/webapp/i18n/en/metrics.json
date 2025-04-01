@@ -3,6 +3,9 @@
     "title": "Application Metrics",
     "refresh.button": "Refresh",
     "updating": "Updating...",
+    "game": {
+      "title": "Game Metrics"
+    },
     "jvm": {
       "title": "JVM Metrics",
       "memory": {

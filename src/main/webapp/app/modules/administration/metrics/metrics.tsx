@@ -18,11 +18,12 @@ import {
 } from 'app/config/constants';
 import {useAppDispatch, useAppSelector} from 'app/config/store';
 import {getSystemMetrics} from '../administration.reducer';
+import GameMetrics from "app/modules/administration/metrics/game-metrics";
 
 
 export const MetricsPage = () => {
   const dispatch = useAppDispatch();
-  const parsedMetrics = useAppSelector(state => state.administration.parsedMetrics);
+  const metrics = useAppSelector(state => state.administration.metrics);
   const isFetching = useAppSelector(state => state.administration.loading);
   let timer = null;
   useEffect(() => {
@@ -90,19 +91,32 @@ export const MetricsPage = () => {
       <hr/>
 
       <Row>
+        <Col md={4}>
+          {metrics && metrics['orbital.metrics'] ? (
+            <GameMetrics
+              gameMetrics={metrics['orbital.metrics']}
+              numberFormat={APP_WHOLE_NUMBER_FORMAT}
+            />
+          ) : (
+            ''
+          )}
+        </Col>
+      </Row>
+      <Row>
         <Col sm="12">
-          <h3>
+          {(metrics?.jvm || metrics?.threadDump || metrics?.processMetrics) && <h3>
             <Translate contentKey="metrics.jvm.title">JVM Metrics</Translate>
-          </h3>
+          </h3>}
           <Row>
-            <Col md="4">{parsedMetrics?.jvm ?
-              <JvmMemory jvmMetrics={parsedMetrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
-            <Col md="4">{parsedMetrics?.threadDump ?
-              <JvmThreads jvmThreads={parsedMetrics?.threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+            <Col md="4">{metrics?.jvm ?
+              <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+            <Col md="4">{metrics?.threadDump ?
+              <JvmThreads jvmThreads={metrics?.threadDump}
+                          wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
             <Col md="4">
-              {parsedMetrics?.processMetrics ? (
+              {metrics?.processMetrics ? (
                 <SystemMetrics
-                  systemMetrics={parsedMetrics.processMetrics}
+                  systemMetrics={metrics.processMetrics}
                   wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
                   timestampFormat={APP_TIMESTAMP_FORMAT}
                 />
@@ -113,14 +127,15 @@ export const MetricsPage = () => {
           </Row>
         </Col>
       </Row>
-      {parsedMetrics?.garbageCollector ? (
-        <GarbageCollectorMetrics garbageCollectorMetrics={parsedMetrics.garbageCollector} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} />
+      {metrics?.garbageCollector ? (
+        <GarbageCollectorMetrics garbageCollectorMetrics={metrics.garbageCollector}
+                                 wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/>
       ) : (
         ''
       )}
-      {parsedMetrics && parsedMetrics['http.server.requests'] ? (
+      {metrics && metrics['http.server.requests'] ? (
         <HttpRequestMetrics
-          requestMetrics={parsedMetrics['http.server.requests']}
+          requestMetrics={metrics['http.server.requests']}
           twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
           wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
         />
