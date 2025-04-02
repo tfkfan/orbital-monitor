@@ -1,10 +1,13 @@
 const PROGRESS_FIELDS = ["used", "max", "committed"];
 
+// PURE SHIT CODE / ОСТОРОЖНО ГОВНОКОД!!
 export const processMetrics = (metrics): any => {
   const res = {};
   for (const [key, value] of Object.entries<any>(metrics)) {
     for (const field of PROGRESS_FIELDS) {
       const prefix = key.replace(`.${field}`, '');
+      if (!Array.isArray(value))
+        continue;
       value.forEach((it: {
         [x: string]: any;
         tags: { id: any; };

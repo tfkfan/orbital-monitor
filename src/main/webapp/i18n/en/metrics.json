@@ -14,6 +14,9 @@
     "rooms": {
       "title": "Game rooms metrics"
     },
+    "system": {
+      "title": "System metrics"
+    },
     "jvm": {
       "title": "JVM Metrics",
       "memory": {

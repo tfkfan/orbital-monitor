@@ -1,5 +1,18 @@
-import React, {useEffect} from 'react';
-import {Button, Col, Progress, Row, Table} from 'reactstrap';
+import React, {useEffect, useState} from 'react';
+import {
+  Button,
+  Card, CardText,
+  CardTitle,
+  Col,
+  Nav,
+  NavItem,
+  NavLink,
+  Progress,
+  Row,
+  TabContent,
+  Table,
+  TabPane
+} from 'reactstrap';
 import {
   GarbageCollectorMetrics,
   HttpRequestMetrics,
@@ -18,8 +31,12 @@ import {
 } from 'app/config/constants';
 import {useAppDispatch, useAppSelector} from 'app/config/store';
 import {getSystemMetrics} from '../administration.reducer';
-import GameMetrics from "app/modules/administration/metrics/game-metrics";
+import GameManagerMetrics from "app/modules/administration/metrics/game-manager-metrics";
+import GameRoomsMetrics from "app/modules/administration/metrics/game-rooms-metrics";
 
+const SYSTEM_METRICS_TAB = "SMT";
+const GAME_MANAGER_METRICS_TAB = "GMMT";
+const GAME_ROOMS_METRICS_TAB = "GRMT";
 
 export const MetricsPage = () => {
   const dispatch = useAppDispatch();
@@ -74,6 +91,8 @@ export const MetricsPage = () => {
     </tr>
   }
 
+  const [activeTabId, setActiveTabId] = useState(SYSTEM_METRICS_TAB);
+
   return (
     <div>
       <h2 id="metrics-page-heading" data-cy="metricsPageHeading">
@@ -89,52 +108,95 @@ export const MetricsPage = () => {
         </Button>
       </p>
       <hr/>
-
-      <Row>
-        <Col md={12}>
-          {metrics && metrics['orbital.metrics'] ? (
-            <GameMetrics
-              gameMetrics={metrics['orbital.metrics']}
-              numberFormat={APP_WHOLE_NUMBER_FORMAT}
-            />
-          ) : (
-            ''
-          )}
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
-          {(metrics?.jvm || metrics?.threadDump || metrics?.processMetrics) && <h3>
-            <Translate contentKey="metrics.jvm.title">JVM Metrics</Translate>
-          </h3>}
-          <Row>
-            <Col md="4">{metrics?.jvm ?
-              <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
-            <Col md="4">{metrics?.threadDump ?
-              <JvmThreads jvmThreads={metrics?.threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
-            <Col md="4">
-              {metrics?.processMetrics ? (
-                <SystemMetrics systemMetrics={metrics.processMetrics} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} timestampFormat={APP_TIMESTAMP_FORMAT}/>
-              ) : ('')}
+      <Nav tabs>
+        <NavItem>
+          <NavLink
+            className={activeTabId === SYSTEM_METRICS_TAB ? "active" : ""}
+            onClick={() => setActiveTabId(SYSTEM_METRICS_TAB)}>
+            <Translate contentKey="metrics.system.title">Metrics</Translate>
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            className={activeTabId === GAME_MANAGER_METRICS_TAB ? "active" : ""}
+            onClick={() => setActiveTabId(GAME_MANAGER_METRICS_TAB)}>
+            <Translate contentKey="metrics.manager.title">Metrics</Translate>
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            className={activeTabId === GAME_ROOMS_METRICS_TAB ? "active" : ""}
+            onClick={() => setActiveTabId(GAME_ROOMS_METRICS_TAB)}>
+            <Translate contentKey="metrics.rooms.title">Metrics</Translate>
+          </NavLink>
+        </NavItem>
+      </Nav>
+      <TabContent activeTab={activeTabId}>
+        <TabPane tabId={SYSTEM_METRICS_TAB}>
+          <Row className="tab-content">
+            <Col sm="12">
+              {(metrics?.jvm || metrics?.threadDump || metrics?.processMetrics) && <h3>
+                <Translate contentKey="metrics.jvm.title">JVM Metrics</Translate>
+              </h3>}
+              <Row>
+                <Col md="4">{metrics?.jvm ?
+                  <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+                <Col md="4">{metrics?.threadDump ?
+                  <JvmThreads jvmThreads={metrics?.threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/> : ''}</Col>
+                <Col md="4">
+                  {metrics?.processMetrics ? (
+                    <SystemMetrics systemMetrics={metrics.processMetrics} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+                                   timestampFormat={APP_TIMESTAMP_FORMAT}/>
+                  ) : ('')}
+                </Col>
+              </Row>
+              {metrics?.garbageCollector ? (
+                <GarbageCollectorMetrics garbageCollectorMetrics={metrics.garbageCollector}
+                                         wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/>
+              ) : (
+                ''
+              )}
+              {metrics && metrics['http.server.requests'] ? (
+                <HttpRequestMetrics
+                  requestMetrics={metrics['http.server.requests']}
+                  twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
+                  wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
+                />
+              ) : (
+                ''
+              )}
             </Col>
           </Row>
-        </Col>
-      </Row>
-      {metrics?.garbageCollector ? (
-        <GarbageCollectorMetrics garbageCollectorMetrics={metrics.garbageCollector}
-                                 wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}/>
-      ) : (
-        ''
-      )}
-      {metrics && metrics['http.server.requests'] ? (
-        <HttpRequestMetrics
-          requestMetrics={metrics['http.server.requests']}
-          twoDigitAfterPointFormat={APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT}
-          wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT}
-        />
-      ) : (
-        ''
-      )}
+        </TabPane>
+        <TabPane tabId={GAME_MANAGER_METRICS_TAB}>
+          <Row className="tab-content">
+            <Col sm="12">
+              {metrics && metrics['orbital.metrics'] ? (
+                <GameManagerMetrics
+                  gameMetrics={metrics['orbital.metrics']}
+                  numberFormat={APP_WHOLE_NUMBER_FORMAT}
+                />
+              ) : (
+                ''
+              )}
+            </Col>
+          </Row>
+        </TabPane>
+        <TabPane tabId={GAME_ROOMS_METRICS_TAB}>
+          <Row className="tab-content">
+            <Col sm="12">
+              {metrics && metrics['orbital.metrics'] ? (
+                <GameRoomsMetrics
+                  gameMetrics={metrics['orbital.metrics']}
+                  numberFormat={APP_WHOLE_NUMBER_FORMAT}
+                />
+              ) : (
+                ''
+              )}
+            </Col>
+          </Row>
+        </TabPane>
+      </TabContent>
     </div>
   );
 };
