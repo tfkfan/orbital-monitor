@@ -21,6 +21,7 @@ import {getSystemMetrics} from '../administration.reducer';
 import {nanToZero} from "react-jhipster/src/util/number-utils";
 
 interface GameMetricsProps {
+  title?:string;
   gameMetrics: any;
   numberFormat: string;
 }
@@ -32,7 +33,7 @@ export const GameManagerMetrics = (props: GameMetricsProps) => {
   }, [props.gameMetrics]);
   return (
     <div>
-      <h3><Translate contentKey="metrics.manager.title">Game manager metrics</Translate></h3>
+      <h5>{props.title ? props.title : <Translate contentKey="metrics.manager.title">Game manager metrics</Translate>}</h5>
       <Row>
         <Col md={12}>
           <Table striped>

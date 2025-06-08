@@ -3,6 +3,7 @@ import {Alert, Col, Progress, Row} from 'reactstrap';
 import {TextFormat, Translate,} from 'react-jhipster';
 
 interface GameRoomsMetricsProps {
+  title?: string;
   gameMetrics: any;
   numberFormat: string;
 }
@@ -14,7 +15,7 @@ export const GameRoomsMetrics = (props: GameRoomsMetricsProps) => {
   }, [props.gameMetrics]);
   return (
     <div>
-      <h3><Translate contentKey="metrics.rooms.title">Game rooms metrics</Translate></h3>
+      <h5>{props.title ? props.title : <Translate contentKey="metrics.rooms.title">Game rooms metrics</Translate>}</h5>
       <Row>
         <Col md={12}>
           {gameMetrics.map((it: any) => {

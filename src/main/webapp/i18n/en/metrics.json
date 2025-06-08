@@ -1,21 +1,26 @@
 {
   "metrics": {
-    "title": "Application Metrics",
+    "title": "Cluster Metrics",
+    "node": "Node",
+    "description": "Here you can find system and game metrics for the current cluster node",
     "refresh.button": "Refresh",
     "updating": "Updating...",
     "metric": "Metric",
     "value": "Value",
     "game": {
-      "title": "Game metrics"
+      "title": "Game metrics",
+      "cluster": "Cluster game metrics"
     },
     "cluster": {
-      "title": "Cluster metrics"
+      "title": "Total metrics"
     },
     "manager": {
-      "title": "Game manager metrics"
+      "title": "Game manager metrics",
+      "cluster": "Cluster game manager metrics"
     },
     "rooms": {
-      "title": "Game rooms metrics"
+      "title": "Game rooms metrics",
+      "cluster": "Cluster game rooms metrics"
     },
     "system": {
       "title": "System metrics"

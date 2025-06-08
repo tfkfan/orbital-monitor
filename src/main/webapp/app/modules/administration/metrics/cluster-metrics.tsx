@@ -1,32 +1,59 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Col, Progress, Row} from 'reactstrap';
-import {TextFormat, Translate,} from 'react-jhipster';
-import {useAppDispatch, useAppSelector} from "app/config/store";
-import {getClusterNodes} from "app/modules/administration/administration.reducer";
-import {IGatewayInfo} from "app/shared/model/gateway.info.model";
+import {Card, CardBody, CardText, CardTitle, Col, Row} from 'reactstrap';
+import {APP_WHOLE_NUMBER_FORMAT} from "app/config/constants";
+import GameManagerMetrics from "app/modules/administration/metrics/game-manager-metrics";
+import GameRoomsMetrics from "app/modules/administration/metrics/game-rooms-metrics";
+import {processClusterMetrics} from "app/shared/util/metrics-utils";
+import {Translate, translate} from "react-jhipster";
 
-interface ClusterMetricsProps {
-  clusterNodes: IGatewayInfo[]
+interface ClusterclusterMetricsProps {
+  clusterMetrics: any[]
 }
 
-export const ClusterMetrics = (props: ClusterMetricsProps) => {
+export const ClusterMetrics = (props: ClusterclusterMetricsProps) => {
+  const [metrics, setMetrics] = useState(null);
+  useEffect(() => {
+    setMetrics(processClusterMetrics(props.clusterMetrics));
+  }, [props.clusterMetrics]);
   return (
-    <div>
-      <h3><Translate contentKey="metrics.cluster.title">Metrics</Translate></h3>
-      <Row>
-        <Col md={12}>
-          {props.clusterNodes && props.clusterNodes.map((it: IGatewayInfo) => {
-            return (
-              <div key={it[0]}>
-                {it.nodeId }
-                {it.address}
-                {it.port}
-              </div>
-            );
-          })}
-        </Col>
-      </Row>
-    </div>
+    <Row>
+      <Col md={12}>
+        <Card className="metrics-card">
+          <CardBody>
+            <CardTitle tag="h2">
+              <Translate contentKey="metrics.cluster.title"></Translate>
+            </CardTitle>
+            <Row>
+              <Col md={12}>
+                {metrics && metrics.metrics && metrics.metrics['orbital.metrics'] ? (
+                  <GameManagerMetrics
+                    title={translate("metrics.manager.cluster")}
+                    gameMetrics={metrics.metrics['orbital.metrics']}
+                    numberFormat={APP_WHOLE_NUMBER_FORMAT}
+                  />
+                ) : (
+                  ''
+                )}
+              </Col>
+            </Row>
+
+            <Row className="tab-content">
+              <Col sm="12">
+                {metrics && metrics.metrics && metrics.metrics['orbital.metrics'] ? (
+                  <GameRoomsMetrics
+                    title={translate("metrics.rooms.cluster")}
+                    gameMetrics={metrics.metrics['orbital.metrics']}
+                    numberFormat={APP_WHOLE_NUMBER_FORMAT}
+                  />
+                ) : (
+                  ''
+                )}
+              </Col>
+            </Row>
+          </CardBody>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 

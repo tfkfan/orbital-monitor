@@ -30,6 +30,15 @@ export const getSystemMetrics = createAsyncThunk('administration/fetch_metrics',
   serializeError: serializeAxiosError,
 });
 
+export const getClusterSystemMetrics = async (clusterNodes: IGatewayInfo[]) => {
+  return await Promise.all(
+    clusterNodes.map(async it => {
+      const link = `http://${it.address}:${it.port}`;
+      return {...it, ...{metrics: (await axios.get(`${link}/metrics`)).data}};
+    })
+  );
+}
+
 export const AdministrationSlice = createSlice({
   name: 'administration',
   initialState: initialState as AdministrationState,
@@ -48,12 +57,12 @@ export const AdministrationSlice = createSlice({
         state.loading = false;
         state.metrics = processMetrics(action.payload.data);
       })
-      .addMatcher(isPending(getSystemHealth, getSystemMetrics,getClusterNodes), state => {
+      .addMatcher(isPending(getSystemHealth, getSystemMetrics, getClusterNodes), state => {
         state.errorMessage = null;
         state.loading = true;
       })
       .addMatcher(
-        isRejected(getSystemHealth, getSystemMetrics,getClusterNodes),
+        isRejected(getSystemHealth, getSystemMetrics, getClusterNodes),
         (state, action) => {
           state.errorMessage = action.error.message;
           state.loading = false;

@@ -117,3 +117,22 @@ export const processMetrics = (metrics): any => {
   }
   return res;
 }
+
+export const processClusterMetrics = (processedMetrics: any[]): any => {
+  let res = {};
+  for (const e of processedMetrics)
+    res = mergeAndSum(res,e);
+  return res;
+}
+
+export const mergeAndSum = (obj1, obj2)=> {
+  const merged = { ...obj1 };
+  for (const key in obj2) {
+    if (Object.prototype.hasOwnProperty.call(merged, key))
+      merged[key] += obj2[key];
+    else
+      merged[key] = obj2[key];
+  }
+  return merged;
+}
+
