@@ -30,18 +30,23 @@ import {
   APP_WHOLE_NUMBER_FORMAT
 } from 'app/config/constants';
 import {useAppDispatch, useAppSelector} from 'app/config/store';
-import {getSystemMetrics} from '../administration.reducer';
+import {getClusterNodes, getSystemMetrics} from '../administration.reducer';
 import GameManagerMetrics from "app/modules/administration/metrics/game-manager-metrics";
 import GameRoomsMetrics from "app/modules/administration/metrics/game-rooms-metrics";
+import ClusterMetrics from "app/modules/administration/metrics/cluster-metrics";
 
+const CLUSTER_METRICS_TAB = "CMT";
 const SYSTEM_METRICS_TAB = "SMT";
 const GAME_MANAGER_METRICS_TAB = "GMMT";
 const GAME_ROOMS_METRICS_TAB = "GRMT";
 
 export const MetricsPage = () => {
   const dispatch = useAppDispatch();
+
+  const clusterNodes = useAppSelector(state => state.administration.clusterNodes);
   const metrics = useAppSelector(state => state.administration.metrics);
   const isFetching = useAppSelector(state => state.administration.loading);
+
   let timer = null;
   useEffect(() => {
     if (timer !== null)
@@ -49,11 +54,15 @@ export const MetricsPage = () => {
     timer = setInterval(() => {
       dispatch(getSystemMetrics());
     }, 2000);
+    dispatch(getClusterNodes());
   }, []);
 
   const getMetrics = () => {
-    if (!isFetching)
-      dispatch(getSystemMetrics());
+    if (isFetching)
+      return
+
+    dispatch(getSystemMetrics());
+    dispatch(getClusterNodes())
   };
 
   const formatGaugeTableRowItem = (item, idx) => {
@@ -91,7 +100,7 @@ export const MetricsPage = () => {
     </tr>
   }
 
-  const [activeTabId, setActiveTabId] = useState(SYSTEM_METRICS_TAB);
+  const [activeTabId, setActiveTabId] = useState(CLUSTER_METRICS_TAB);
 
   return (
     <div>
@@ -109,6 +118,13 @@ export const MetricsPage = () => {
       </p>
       <hr/>
       <Nav tabs>
+        <NavItem>
+          <NavLink
+            className={activeTabId === CLUSTER_METRICS_TAB ? "active" : ""}
+            onClick={() => setActiveTabId(CLUSTER_METRICS_TAB)}>
+            <Translate contentKey="metrics.cluster.title">Metrics</Translate>
+          </NavLink>
+        </NavItem>
         <NavItem>
           <NavLink
             className={activeTabId === SYSTEM_METRICS_TAB ? "active" : ""}
@@ -132,6 +148,13 @@ export const MetricsPage = () => {
         </NavItem>
       </Nav>
       <TabContent activeTab={activeTabId}>
+        <TabPane tabId={CLUSTER_METRICS_TAB}>
+          <Row className="tab-content">
+            <Col sm="12">
+              <ClusterMetrics clusterNodes={clusterNodes}/>
+            </Col>
+          </Row>
+        </TabPane>
         <TabPane tabId={SYSTEM_METRICS_TAB}>
           <Row className="tab-content">
             <Col sm="12">

@@ -4,18 +4,23 @@ import {createAsyncThunk, createSlice, isPending, isRejected} from '@reduxjs/too
 import {serializeAxiosError} from 'app/shared/reducers/reducer.utils';
 import {AppThunk} from 'app/config/store';
 import {processMetrics} from "app/shared/util/metrics-utils";
+import {IGatewayInfo} from "app/shared/model/gateway.info.model";
 
 const initialState = {
   loading: false,
   errorMessage: null,
   health: {} as any,
   metrics: {} as any,
+  clusterNodes: [] as IGatewayInfo[],
   totalItems: 0,
 };
 
 export type AdministrationState = Readonly<typeof initialState>;
 
 // Actions
+export const getClusterNodes = createAsyncThunk('administration/fetch_cluster_nodes', async () => axios.get<any>('/cluster/list'), {
+  serializeError: serializeAxiosError,
+});
 
 export const getSystemHealth = createAsyncThunk('administration/fetch_health', async () => axios.get<any>('/health'), {
   serializeError: serializeAxiosError,
@@ -31,6 +36,10 @@ export const AdministrationSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
+      .addCase(getClusterNodes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.clusterNodes = action.payload.data;
+      })
       .addCase(getSystemHealth.fulfilled, (state, action) => {
         state.loading = false;
         state.health = action.payload.data;
@@ -39,13 +48,12 @@ export const AdministrationSlice = createSlice({
         state.loading = false;
         state.metrics = processMetrics(action.payload.data);
       })
-
-      .addMatcher(isPending(getSystemHealth, getSystemMetrics), state => {
+      .addMatcher(isPending(getSystemHealth, getSystemMetrics,getClusterNodes), state => {
         state.errorMessage = null;
         state.loading = true;
       })
       .addMatcher(
-        isRejected(getSystemHealth, getSystemMetrics),
+        isRejected(getSystemHealth, getSystemMetrics,getClusterNodes),
         (state, action) => {
           state.errorMessage = action.error.message;
           state.loading = false;

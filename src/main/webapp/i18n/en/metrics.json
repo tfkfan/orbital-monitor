@@ -8,6 +8,9 @@
     "game": {
       "title": "Game metrics"
     },
+    "cluster": {
+      "title": "Cluster metrics"
+    },
     "manager": {
       "title": "Game manager metrics"
     },
